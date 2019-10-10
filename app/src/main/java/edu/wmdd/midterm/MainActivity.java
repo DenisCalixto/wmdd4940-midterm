@@ -3,14 +3,12 @@ package edu.wmdd.midterm;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -22,90 +20,110 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private String url = "https://learn.operatoroverload.com/rental/";
-//    private String url = "http://159.65.44.135/api/jobs.json";
 
-    private RecyclerView mList;
-
-    private LinearLayoutManager linearLayoutManager;
-    private DividerItemDecoration dividerItemDecoration;
-    private List<Property> propertyList;
-    private RecyclerView.Adapter adapter;
+//    private RecyclerView mList;
+//
+//    private LinearLayoutManager linearLayoutManager;
+//    private DividerItemDecoration dividerItemDecoration;
+//    private List<Property> propertyList;
+//    private RecyclerView.Adapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mList = findViewById(R.id.main_list);
+//        mList = findViewById(R.id.main_list);
 
-        propertyList = new ArrayList<>();
-        adapter = new PropertyAdapter(getApplicationContext(),propertyList);
+//        propertyList = new ArrayList<>();
+//        adapter = new PropertyAdapter(getApplicationContext(),propertyList);
+//
+//        linearLayoutManager = new LinearLayoutManager(this);
+//        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+//        dividerItemDecoration = new DividerItemDecoration(mList.getContext(), linearLayoutManager.getOrientation());
+//
+//        mList.setHasFixedSize(true);
+//        mList.setLayoutManager(linearLayoutManager);
+//        mList.addItemDecoration(dividerItemDecoration);
+//        mList.setAdapter(adapter);
 
-        linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        dividerItemDecoration = new DividerItemDecoration(mList.getContext(), linearLayoutManager.getOrientation());
+//        Button fab = findViewById(R.id.buttonGet);
+////        fab.setOnClickListener(new View.OnClickListener() {
+////            @Override
+////            public void onClick(View view) {
+////                getData();
+////            }
+////        });
 
-        mList.setHasFixedSize(true);
-        mList.setLayoutManager(linearLayoutManager);
-        mList.addItemDecoration(dividerItemDecoration);
-        mList.setAdapter(adapter);
+        Spinner spinner = (Spinner) findViewById(R.id.optionSpinner);
+        spinner.setOnItemSelectedListener(this);
 
-        Button fab = findViewById(R.id.buttonGet);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getData();
-            }
-        });
-
+        ArrayAdapter<CharSequence> dataAdapter = ArrayAdapter.createFromResource(this,
+                R.array.spinner_options, android.R.layout.simple_spinner_item);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(dataAdapter);
     }
 
-    private void getData() {
+    public void onItemSelected(AdapterView<?> parent, View view,
+                               int pos, long id) {
+        // An item was selected. You can retrieve the selected item using
+        String item = parent.getItemAtPosition(pos).toString().toLowerCase();
+//        Log.d("itemSelected", item);
+        getData(item);
+    }
 
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
         final TextView textContent = findViewById(R.id.textContent);
+        textContent.setText("");
+    }
 
-        final EditText editText = findViewById(R.id.editText);
+    private void getData(final String resource) {
 
-        final String resource = editText.getText().toString();
+        if (resource != "") {
 
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url + resource, new Response.Listener<JSONArray>() {
-            @Override
-            public void onResponse(JSONArray response) {
-                textContent.setText(response.toString());
-                for (int i = 0; i < response.length(); i++) {
-                    try {
-                        JSONObject jsonObject = response.getJSONObject(i);
+            final TextView textContent = findViewById(R.id.textContent);
 
-                        Property property = new Property();
-                        property.setName(jsonObject.getString(resource.substring(0, resource.length() - 1)));
-//                        property.setId(jsonObject.getInt("id"));
-//                        property.setImage_url(jsonObject.getString("image"));
+    //        final EditText editText = findViewById(R.id.editText);
 
-                        //propertyList.add(property);
-                    } catch (JSONException e) {
-                        textContent.setText("Error");
-                        Log.d("Test", "Calling FAB");
-                        e.printStackTrace();
-                        break;
+    //        final String resource = editText.getText().toString();
+
+            JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url + resource, new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    textContent.setText(response.toString());
+                    for (int i = 0; i < response.length(); i++) {
+                        try {
+                            JSONObject jsonObject = response.getJSONObject(i);
+
+                            Property property = new Property();
+                            property.setName(jsonObject.getString(resource.substring(0, resource.length() - 1)));
+    //                        property.setId(jsonObject.getInt("id"));
+    //                        property.setImage_url(jsonObject.getString("image"));
+
+                            //propertyList.add(property);
+                        } catch (JSONException e) {
+                            textContent.setText("Error");
+                            Log.d("Test", "Calling FAB");
+                            e.printStackTrace();
+                            break;
+                        }
                     }
+//                    adapter.notifyDataSetChanged();
                 }
-                adapter.notifyDataSetChanged();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Volley", error.toString());
-                textContent.setText("Error");
-            }
-        });
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonArrayRequest);
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("Volley", error.toString());
+                    textContent.setText("Error");
+                }
+            });
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            requestQueue.add(jsonArrayRequest);
+        }
     }
 }
 
