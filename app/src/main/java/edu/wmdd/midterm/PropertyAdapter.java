@@ -8,8 +8,6 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.volley.toolbox.NetworkImageView;
-
 import java.util.List;
 
 //import com.bumptech.glide.Glide;
@@ -35,7 +33,7 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
         Property property = list.get(position);
 
-        holder.textSummary.setText(property.getSummary());
+        holder.textName.setText(property.getName());
         holder.textId.setText(String.valueOf(property.getId()));
 
 //        String url = String.valueOf(property.getImage_url());
@@ -56,15 +54,15 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.ViewHo
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView textSummary, textRating, textId;
-        public NetworkImageView imageThumbnail;
+        public TextView textName, textRating, textId;
+//        public NetworkImageView imageThumbnail;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
-            textSummary = itemView.findViewById(R.id.main_summary);
+            textName = itemView.findViewById(R.id.main_name);
             textId = itemView.findViewById(R.id.main_id);
-            imageThumbnail = itemView.findViewById(R.id.thumbnail);
+//            imageThumbnail = itemView.findViewById(R.id.thumbnail);
         }
     }
 

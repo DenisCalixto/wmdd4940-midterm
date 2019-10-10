@@ -2,7 +2,7 @@ package edu.wmdd.midterm;
 
 public class Property {
 
-    public String summary;
+    public String name;
     public int id;
 //    private String image_url;
 
@@ -10,18 +10,18 @@ public class Property {
 
     }
 
-    public Property(String summary, int id, String image_url) {
-        this.summary = summary;
+    public Property(String name, int id, String image_url) {
+        this.name = name;
         this.id = id;
 //        this.image_url = image_url;
     }
 
-    public String getSummary() {
-        return summary;
+    public String getName() {
+        return name;
     }
 
-    public void setSummary(String summary) {
-        this.summary = summary;
+    public void setName(String name) {
+        this.name = name;
     }
 
 //    public String getImage_url() {

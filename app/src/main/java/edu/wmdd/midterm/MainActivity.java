@@ -1,13 +1,16 @@
 package edu.wmdd.midterm;
 
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.app.ProgressDialog;
-import android.os.Bundle;
-import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -24,11 +27,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    //    private String url = "http://100.20.115.205/properties.json";
-    //private String url = "http://greenfillproject.com/api/jobs/";
-    private String url = "http://159.65.44.135/api/jobs.json";
-//    private String url = "https://gist.githubusercontent.com/aws1994/f583d54e5af8e56173492d3f60dd5ebf/raw/c7796ba51d5a0d37fc756cf0fd14e54434c547bc/anime.json";
-//    private String url = "http://151.101.52.133/aws1994/f583d54e5af8e56173492d3f60dd5ebf/raw/c7796ba51d5a0d37fc756cf0fd14e54434c547bc/anime.json";
+    private String url = "https://learn.operatoroverload.com/rental/";
+//    private String url = "http://159.65.44.135/api/jobs.json";
 
     private RecyclerView mList;
 
@@ -56,41 +56,52 @@ public class MainActivity extends AppCompatActivity {
         mList.addItemDecoration(dividerItemDecoration);
         mList.setAdapter(adapter);
 
-        getData();
+        Button fab = findViewById(R.id.buttonGet);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getData();
+            }
+        });
+
     }
 
     private void getData() {
-        final ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Loading...");
-        progressDialog.show();
 
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url, new Response.Listener<JSONArray>() {
+        final TextView textContent = findViewById(R.id.textContent);
+
+        final EditText editText = findViewById(R.id.editText);
+
+        final String resource = editText.getText().toString();
+
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(url + resource, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
+                textContent.setText(response.toString());
                 for (int i = 0; i < response.length(); i++) {
                     try {
                         JSONObject jsonObject = response.getJSONObject(i);
 
                         Property property = new Property();
-                        property.setSummary(jsonObject.getString("summary"));
-                        property.setId(jsonObject.getInt("id"));
+                        property.setName(jsonObject.getString(resource.substring(0, resource.length() - 1)));
+//                        property.setId(jsonObject.getInt("id"));
 //                        property.setImage_url(jsonObject.getString("image"));
 
-                        propertyList.add(property);
+                        //propertyList.add(property);
                     } catch (JSONException e) {
+                        textContent.setText("Error");
                         Log.d("Test", "Calling FAB");
                         e.printStackTrace();
-                        progressDialog.dismiss();
+                        break;
                     }
                 }
                 adapter.notifyDataSetChanged();
-                progressDialog.dismiss();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("Volley", error.toString());
-                progressDialog.dismiss();
+                textContent.setText("Error");
             }
         });
         RequestQueue requestQueue = Volley.newRequestQueue(this);
